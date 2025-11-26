@@ -1,7 +1,5 @@
 # created by virtualenv automatically
-*.pth
-*.pt
-input/
-output/
-datasets/
+  .idea/
+  .venv/
+
 
