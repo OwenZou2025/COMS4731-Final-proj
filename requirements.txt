@@ -1,0 +1,12 @@
+torch
+torchvision
+Pillow
+gdown
+opencv-python
+numpy
+kaggle
+transfomers
+datasets
+pandas
+matplotlib
+scikit-learn
