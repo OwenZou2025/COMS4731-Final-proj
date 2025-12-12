@@ -48,7 +48,7 @@ class OutfitSelection(BaseModel):
     ]
     fit: str
     reason: str
-
+    advice: str
 
 def load_model(checkpoint_path: str, model_name: str, device: torch.device):
     checkpoint = torch.load(
@@ -234,7 +234,8 @@ Output:
   "selected_onepiece": null,
   "style": "business_casual",
   "fit": "appropriate",
-  "reason": "This white formal shirt and navy trousers combo is a reliable business casual foundation. The formality of the pieces perfectly matches the professional setting of a business meeting, projecting competence. Improving Advice: Add a brown leather belt and matching leather loafers to refine the look and complete the polished aesthetic."
+  "reason": "This white formal shirt and navy trousers combo is a reliable business casual foundation. The formality of the pieces perfectly matches the professional setting of a business meeting, projecting competence.",
+  "advice": "Add a brown leather belt and matching leather loafers to refine the look and complete the polished aesthetic."
 }}
 
 #### Example 2 (One-Piece)
@@ -286,7 +287,8 @@ Output:
   "selected_onepiece": "Women black party dress",
   "style": "evening_elegant",
   "fit": "appropriate",
-  "reason": "The black party dress is the only appropriate choice for an Evening cocktail party. Its 'Party' usage directly aligns with the 'evening_elegant' style required, unlike the casual top/jeans or the summery jumpsuit. Improving Advice: Pair this dress with sheer black tights and metallic accessories (e.g., silver clutch/earrings) to enhance the elegance and provide warmth for winter."
+  "reason": "The black party dress is the only appropriate choice for an Evening cocktail party. Its 'Party' usage directly aligns with the 'evening_elegant' style required, unlike the casual top/jeans or the summery jumpsuit.", 
+  "advice": "Pair this dress with sheer black tights and metallic accessories (e.g., silver clutch/earrings) to enhance the elegance and provide warmth for winter."
 }}
 
 ---
@@ -354,7 +356,7 @@ def main():
     print("Style:", analysis.style)
     print("Fit:", analysis.fit)
     print("Reason:", analysis.reason)
-
+    print("Advice:", analysis.advice)
 
 if __name__ == "__main__":
     main()
