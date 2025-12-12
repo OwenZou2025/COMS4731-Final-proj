@@ -121,7 +121,7 @@ gender, articleType, baseColour, season, usage.
 
 Input structure:
 - "tops": a list of separate upper garments (may be empty)
-- "bottoms": a list of separate lower garments (may be empty)
+- "bottoms": a list of separate lower garments (may may be empty)
 - "onepieces": a list of one-piece outfits such as dresses or jumpsuits (may be empty)
 - "event": the occasion.
 
@@ -172,7 +172,7 @@ the combination of garments, fabric type, silhouette, color, and level of refine
 Evaluate the fit as one of:
 ["appropriate","too casual","too formal","inappropriate"].
 
-Explain briefly (max 100 words).
+Explain the outfit choice by providing a detailed **reasoning (why the chosen pieces work for the event)** and a brief **improving advice (how to elevate the look)**. **The total text length for the 'reason' key must not exceed 100 words.**
 
 You must output only valid JSON with the keys:
 outfit_type, selected_top, selected_bottom, selected_onepiece, style, fit, reason.
@@ -182,11 +182,120 @@ If none of the possible outfits are appropriate, choose the least mismatched one
 Describe garments using short natural phrases such as:
 "Men white formal shirt", "Women black casual jeans", "Women black party dress".
 
+---
+### Few-Shot Examples
+---
+
+#### Example 1 (Top-Bottom)
+
+Input:
+{{
+  "tops": [
+    {{
+      "gender": "Men",
+      "articleType": "Shirt",
+      "baseColour": "White",
+      "season": "Summer",
+      "usage": "Formal"
+    }},
+    {{
+      "gender": "Men",
+      "articleType": "Tshirt",
+      "baseColour": "Black",
+      "season": "Summer",
+      "usage": "Casual"
+    }}
+  ],
+  "bottoms": [
+    {{
+      "gender": "Men",
+      "articleType": "Trousers",
+      "baseColour": "Navy Blue",
+      "season": "Summer",
+      "usage": "Formal"
+    }},
+    {{
+      "gender": "Men",
+      "articleType": "Shorts",
+      "baseColour": "Grey",
+      "season": "Summer",
+      "usage": "Sports"
+    }}
+  ],
+  "onepieces": [],
+  "event": "Business meeting"
+}}
+
+Output:
+{{
+  "outfit_type": "top_bottom",
+  "selected_top": "Men white formal shirt",
+  "selected_bottom": "Men navy blue formal trousers",
+  "selected_onepiece": null,
+  "style": "business_casual",
+  "fit": "appropriate",
+  "reason": "This white formal shirt and navy trousers combo is a reliable business casual foundation. The formality of the pieces perfectly matches the professional setting of a business meeting, projecting competence. Improving Advice: Add a brown leather belt and matching leather loafers to refine the look and complete the polished aesthetic."
+}}
+
+#### Example 2 (One-Piece)
+
+Input:
+{{
+  "tops": [
+    {{
+      "gender": "Women",
+      "articleType": "Tops",
+      "baseColour": "Grey",
+      "season": "Winter",
+      "usage": "Casual"
+    }}
+  ],
+  "bottoms": [
+    {{
+      "gender": "Women",
+      "articleType": "Jeans",
+      "baseColour": "Blue",
+      "season": "Winter",
+      "usage": "Casual"
+    }}
+  ],
+  "onepieces": [
+    {{
+      "gender": "Women",
+      "articleType": "Dress",
+      "baseColour": "Black",
+      "season": "Winter",
+      "usage": "Party"
+    }},
+    {{
+      "gender": "Women",
+      "articleType": "Jumpsuit",
+      "baseColour": "Red",
+      "season": "Summer",
+      "usage": "Travel"
+    }}
+  ],
+  "event": "Evening cocktail party in winter"
+}}
+
+Output:
+{{
+  "outfit_type": "onepiece",
+  "selected_top": null,
+  "selected_bottom": null,
+  "selected_onepiece": "Women black party dress",
+  "style": "evening_elegant",
+  "fit": "appropriate",
+  "reason": "The black party dress is the only appropriate choice for an Evening cocktail party. Its 'Party' usage directly aligns with the 'evening_elegant' style required, unlike the casual top/jeans or the summery jumpsuit. Improving Advice: Pair this dress with sheer black tights and metallic accessories (e.g., silver clutch/earrings) to enhance the elegance and provide warmth for winter."
+}}
+
+---
+### Your Task
+---
 Input:
 {input_json}
 """
     return prompt
-
 
 def main():
     if len(sys.argv) < 3:
