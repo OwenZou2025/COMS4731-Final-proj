@@ -139,7 +139,46 @@ def load_seg_model(checkpoint_path, device='cpu'):
 
     return net
 
-def segmentation(mask_dir, original_dir, output_dir):
+def combine_masks(mask_paths):
+    """Combine multiple mask files into a single unified mask.
+    
+    Args:
+        mask_paths: List of paths to mask files
+    
+    Returns:
+        Combined mask as numpy array, or None if no masks
+    """
+    if not mask_paths:
+        return None
+    
+    import cv2
+    combined_mask = None
+    
+    for mask_path in mask_paths:
+        if not os.path.exists(mask_path):
+            continue
+            
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        if mask is None:
+            continue
+            
+        if combined_mask is None:
+            combined_mask = mask
+        else:
+            # Combine using logical OR to include all clothing regions
+            combined_mask = cv2.bitwise_or(combined_mask, mask)
+    
+    return combined_mask
+
+def segmentation(mask_dir, original_dir, output_dir, white_bg_only=True):
+    """Apply mask to original image and create segmented clothing.
+    
+    Args:
+        mask_dir: Path to the mask image
+        original_dir: Path to the original image
+        output_dir: Directory to save output
+        white_bg_only: If True, only save white background version (default)
+    """
     mask = cv2.imread(mask_dir, cv2.IMREAD_GRAYSCALE)
     original = cv2.imread(original_dir)
 
@@ -157,12 +196,17 @@ def segmentation(mask_dir, original_dir, output_dir):
     background = cv2.bitwise_and(white_background, white_background, mask=inverse_mask)
     cloth_with_white_bg = cv2.add(cloth_extracted, background)
 
-    original_rgba = cv2.cvtColor(original, cv2.COLOR_BGR2BGRA)
-    original_rgba[:, :, 3] = binary_mask
-
-    cv2.imwrite(output_prefix + '_black_bg.png', cloth_extracted)
+    # Always save white background version
     cv2.imwrite(output_prefix + '_white_bg.png', cloth_with_white_bg)
-    cv2.imwrite(output_prefix + '_transparent.png', original_rgba)
+    
+    # Optionally save other versions
+    if not white_bg_only:
+        original_rgba = cv2.cvtColor(original, cv2.COLOR_BGR2BGRA)
+        original_rgba[:, :, 3] = binary_mask
+        cv2.imwrite(output_prefix + '_black_bg.png', cloth_extracted)
+        cv2.imwrite(output_prefix + '_transparent.png', original_rgba)
+    
+    return output_prefix + '_white_bg.png'
 
 
 if __name__ == '__main__':
