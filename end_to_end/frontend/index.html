@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Sense - AI Style Advisor</title>
+    <link rel="stylesheet" href="styles.css?v=6">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <h1 class="logo" id="logoBtn" style="cursor: pointer;">✨ Fashion Sense</h1>
+                <div class="nav-center">
+                    <div class="backend-toggle">
+                        <button id="backendToggle" class="backend-toggle-btn" title="Switch between Gemini AI and Custom ML Backend">
+                            <span class="backend-label">Backend:</span>
+                            <span class="backend-name" id="backendName">Gemini</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12h18M3 6h18M3 18h18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <button class="nav-btn" data-view="upload">Upload</button>
+                    <button class="nav-btn" data-view="wardrobe">My Wardrobe</button>
+                    <button class="nav-btn" data-view="history">History</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload View -->
+            <div id="upload-view" class="view">
+                <div class="upload-section">
+                    <div class="section-header">
+                        <div class="section-title-group">
+                            <h2>Upload Your Clothing Items</h2>
+                            <p>Get personalized style recommendations</p>
+                        </div>
+                    </div>
+
+                    <!-- Upload Limit Message -->
+                    <p class="upload-limit-message">Select up to 10 items maximum</p>
+
+                    <!-- Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" multiple accept="image/*" hidden>
+                        <div class="upload-placeholder">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <h3>Drag & drop images here</h3>
+                            <p>or click to browse files</p>
+                            <span class="upload-hint">Supports: JPG, PNG, WEBP</span>
+                        </div>
+                    </div>
+
+                    <!-- Item Counter -->
+                    <div id="itemCounter" class="item-counter">
+                        <span id="itemCount">0</span> <span id="itemCountText">items selected</span>
+                    </div>
+
+                    <!-- Image Previews -->
+                    <div id="imagePreviews" class="image-previews"></div>
+
+                    <!-- Save to Wardrobe Button -->
+                    <div id="saveToWardrobeSection" class="save-to-wardrobe-section hidden">
+                        <div class="save-wardrobe-actions">
+                            <button id="saveToWardrobe" class="btn-save-wardrobe">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                <span>Save to My Wardrobe</span>
+                            </button>
+                            <button id="clearAllUploads" class="btn-clear-all hidden">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Include Wardrobe Items -->
+                    <div id="includeWardrobeSection" class="include-wardrobe-section">
+                        <button id="includeWardrobeBtn" class="btn-include-wardrobe">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                            <span>Include Items from My Wardrobe</span>
+                        </button>
+                        <p class="include-wardrobe-hint">Combine uploaded images with items from your saved wardrobe</p>
+                    </div>
+
+                    <!-- Wardrobe Items Preview (when included) -->
+                    <div id="includedWardrobePreview" class="included-wardrobe-preview hidden">
+                        <div class="included-wardrobe-header">
+                            <h4>Items from Wardrobe (<span id="includedWardrobeCount">0</span>)</h4>
+                            <button id="removeIncludedWardrobe" class="btn-text-danger">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                                Remove Wardrobe Items
+                            </button>
+                        </div>
+                        <div id="includedWardrobeItems" class="included-wardrobe-items"></div>
+                    </div>
+
+                    <!-- Context Selection -->
+                    <div class="context-section">
+                        <h3>What's the occasion?</h3>
+                        <div class="context-options">
+                            <button class="context-btn" data-context="Office">
+                                <span class="context-icon">💼</span>
+                                <span>Office</span>
+                            </button>
+                            <button class="context-btn" data-context="Formal">
+                                <span class="context-icon">👗</span>
+                                <span>Formal</span>
+                            </button>
+                            <button class="context-btn" data-context="Casual">
+                                <span class="context-icon">👕</span>
+                                <span>Casual</span>
+                            </button>
+                            <button class="context-btn" data-context="Athletic">
+                                <span class="context-icon">👟</span>
+                                <span>Athletic</span>
+                            </button>
+                            <button class="context-btn" data-context="Evening Wear">
+                                <span class="context-icon">✨</span>
+                                <span>Evening</span>
+                            </button>
+                        </div>
+                        
+                        <div class="custom-context">
+                            <label for="customContext">Or describe your own occasion:</label>
+                            <input type="text" id="customContext" name="customContext" placeholder="e.g., casual dinner date, beach party..." autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button id="getRecommendation" class="submit-btn" disabled>
+                        <span>Get Style Recommendation</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results View -->
+            <div id="results-view" class="view">
+                <div class="results-section">
+                    <div class="section-header">
+                        <h2>Your Style Recommendation</h2>
+                        <button class="btn-secondary" id="backToUpload">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+
+                    <!-- Selected Items Display -->
+                    <div id="selectedItemsDisplay" class="selected-items-section">
+                        <!-- Selected items will be inserted here -->
+                    </div>
+
+                    <div class="results-grid">
+                        <!-- Attributes Panel -->
+                        <div class="result-card attributes-card">
+                            <h3>Item Attributes</h3>
+                            <div id="attributesPanel" class="attributes-content">
+                                <!-- Vision model attributes will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- LLM Recommendation Card -->
+                        <div class="result-card recommendation-card">
+                            <div id="llmRecommendation" class="recommendation-content">
+                                <!-- LLM response will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="saveToHistory" class="btn-save">
+                        Save to History
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wardrobe View -->
+            <div id="wardrobe-view" class="view">
+                <div class="wardrobe-section">
+                    <div class="section-header">
+                        <div class="section-title-group">
+                            <h2>My Wardrobe</h2>
+                            <p class="wardrobe-subtitle">Select up to 10 items to style</p>
+                        </div>
+                        <div class="wardrobe-header-buttons">
+                            <button class="btn-secondary" id="clearWardrobe">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                Clear Selection <span id="wardrobeSelectionCounter"></span>
+                            </button>
+                            <button class="btn-secondary" id="selectAllWardrobe" style="display: none;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 11 12 14 22 4"></polyline>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                                Select All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="wardrobeGrid" class="wardrobe-grid">
+                        <!-- Wardrobe items will be inserted here -->
+                    </div>
+
+                    <!-- Selected wardrobe items for styling -->
+                    <div id="selectedWardrobeSection" class="selected-wardrobe-section hidden">
+                        <div id="selectedWardrobeItems" class="selected-wardrobe-items"></div>
+                        
+                        <!-- Context Selection for Wardrobe -->
+                        <div id="wardrobeContextSection" class="context-section">
+                            <h3>What's the occasion?</h3>
+                            <div class="context-options">
+                                <button class="wardrobe-context-btn" data-context="Office">
+                                    <span class="context-icon">💼</span>
+                                    <span>Office</span>
+                                </button>
+                                <button class="wardrobe-context-btn" data-context="Formal">
+                                    <span class="context-icon">👗</span>
+                                    <span>Formal</span>
+                                </button>
+                                <button class="wardrobe-context-btn" data-context="Casual">
+                                    <span class="context-icon">👕</span>
+                                    <span>Casual</span>
+                                </button>
+                                <button class="wardrobe-context-btn" data-context="Athletic">
+                                    <span class="context-icon">👟</span>
+                                    <span>Athletic</span>
+                                </button>
+                                <button class="wardrobe-context-btn" data-context="Evening Wear">
+                                    <span class="context-icon">✨</span>
+                                    <span>Evening</span>
+                                </button>
+                            </div>
+                            
+                            <div class="custom-context">
+                                <label for="wardrobeCustomContext">Or describe your own occasion:</label>
+                                <input type="text" id="wardrobeCustomContext" name="wardrobeCustomContext" placeholder="e.g., casual dinner date, beach party..." autocomplete="off" spellcheck="false">
+                            </div>
+                        </div>
+
+                        <button id="getWardrobeRecommendation" class="submit-btn" disabled>
+                            <span>Get Style Recommendation</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History View -->
+            <div id="history-view" class="view">
+                <div class="history-section">
+                    <div class="section-header">
+                        <h2>Previous Analyses</h2>
+                        <button class="btn-secondary" id="clearHistory">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Clear All
+                        </button>
+                    </div>
+                    <div id="historyList" class="history-list">
+                        <!-- History items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State (overlay for all views) -->
+            <div id="loadingState" class="loading-state hidden">
+                <div class="spinner"></div>
+                <p>Analyzing your items...</p>
+                <span class="loading-substep">Processing images with vision model</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Wardrobe Delete Confirmation Modal -->
+    <div id="deleteWardrobeModal" class="modal-overlay hidden">
+        <div class="modal-content wardrobe-delete-modal">
+            <div class="modal-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+            </div>
+            <h3 class="modal-title">Remove this item from your wardrobe?</h3>
+            <p class="modal-description">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancelDeleteWardrobe" class="btn-modal btn-cancel">
+                    Cancel
+                </button>
+                <button id="confirmDeleteWardrobe" class="btn-modal btn-delete">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Confirmation Modal -->
+    <div id="historyConfirmModal" class="modal-overlay hidden">
+        <div class="modal-content history-confirm-modal">
+            <h3 class="modal-title" id="historyModalTitle">Clear all history?</h3>
+            <p class="modal-description" id="historyModalDescription">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancelHistoryAction" class="btn-modal btn-cancel">
+                    Cancel
+                </button>
+                <button id="confirmHistoryAction" class="btn-modal btn-delete">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
